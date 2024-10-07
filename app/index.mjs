@@ -1,5 +1,5 @@
-import sayHello from "./modules/start.mjs";
-import sayGoodBuy from "./modules/end.mjs";
+import sayHello from "./modules/sayHello.mjs";
+import sayGoodBuy from "./modules/sayGoodBuy.mjs";
 
 const App = () => {
     sayHello();
