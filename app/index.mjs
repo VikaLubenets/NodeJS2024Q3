@@ -1,10 +1,10 @@
-import sayHello from "./modules/sayHello.mjs";
-import sayGoodBuy from "./modules/sayGoodBuy.mjs";
+import Client from "./modules/client.mjs";
 
 const App = () => {
-    sayHello();
-
-    sayGoodBuy();
+    const client = new Client();
+    client.sayHello();
+    client.run();
+    client.sayGoodbuy();
 };
 
 App();
