@@ -1,4 +1,4 @@
-import up from './commands/up.mjs'
+import path from 'node:path'
 
 export default class CommandManager {
     constructor(client){
@@ -9,7 +9,7 @@ export default class CommandManager {
     execute(command, args){
         if(this.commands.includes(command)){
             switch(command){
-                case 'up': up()
+                case 'up': this.up()
                 break
 
             case '.exit':
@@ -30,6 +30,12 @@ export default class CommandManager {
         if(this.commands.length > 0){
             this.commands.map(command => console.log(command))
         }
+    }
+
+    up(){
+        const currentDirectory = this.client.getCurrentDirectory();
+        const upDirectory = path.resolve(currentDirectory, '..');
+        this.client.setCurrentDirectory(upDirectory);
     }
 
 }

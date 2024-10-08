@@ -1,15 +1,15 @@
 import os from 'node:os';
-import { argv, cwd } from 'node:process';
+import path from 'node:path';
 import * as readline from 'node:readline/promises';
-import { stdin as input, stdout as output } from 'node:process';
+import { stdin as input, stdout as output, argv, cwd  } from 'node:process';
 import process from 'node:process';
 import CommandManager from './commandManager.mjs';
 
 export default class Client {
     constructor(){
         this.rl = readline.createInterface({ input, output });
-        this.homeDirectory = os.homedir();
-        this.currentDirectory = cwd();
+        this.rootDirectory = path.parse(cwd()).root;
+        this.currentDirectory = os.homedir();
         this.userNameArg = argv.slice(2).find(arg => arg.startsWith('--username='));
         this.userName = this.userNameArg ? this.userNameArg.split('=')[1] : 'user';
         this.commandManager = new CommandManager(this);
@@ -31,12 +31,28 @@ export default class Client {
         this.sayGoodbuy();
     }
 
+    getCurrentDirectory(){
+        return this.currentDirectory
+    }
+
+    setCurrentDirectory(directory){
+        const pathResolved = path.resolve(directory);
+
+        if (pathResolved === this.rootDirectory) {
+            console.log("You are already at the root directory.");
+        } else if(pathResolved.startsWith(this.rootDirectory)){
+            this.currentDirectory = pathResolved;
+        } else {
+            console.log("Wrong directory. Try again");
+        }
+    }
+
     sayHello(){
         console.log(`Welcome to the File Manager, ${this.userName}!`);
     }
 
-    showPath(direcory) {
-        console.log(`You are currently in ${direcory ?? this.currentDirectory}`);
+    showPath() {
+        console.log(`You are currently in ${this.currentDirectory}`);
     }
 
     sayGoodbuy(){
