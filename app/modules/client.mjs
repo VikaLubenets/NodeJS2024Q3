@@ -23,7 +23,7 @@ export default class Client {
         this.rl.on('line', (input) => {
             if(input !== '.exit') {
                 const [command, ...args] = input.trim().split(' ');
-                this.commandManager.executeCommand(command, args);
+                this.commandManager.execute(command, args);
                 this.showPath();
             }
         });
