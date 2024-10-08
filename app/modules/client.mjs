@@ -1,20 +1,31 @@
 import os from 'node:os';
-import { argv } from 'node:process';
+import { argv, cwd } from 'node:process';
 import * as readline from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
 import process from 'node:process';
+import CommandManager from './commandManager.mjs';
 
 export default class Client {
     constructor(){
-        this.homeDirectory = os.homedir()
+        this.rl = readline.createInterface({ input, output });
+        this.homeDirectory = os.homedir();
+        this.currentDirectory = cwd();
         this.userNameArg = argv.slice(2).find(arg => arg.startsWith('--username='));
         this.userName = this.userNameArg ? this.userNameArg.split('=')[1] : 'user';
-        this.rl = readline.createInterface({ input, output });
+        this.commandManager = new CommandManager();
     }
 
     run(){
+        this.sayHello();
+        this.commandManager.print();
 
+        this.rl.on('line', (input) => {
+            if(input !== '.exit') {
+                this.commandManager.execute(input);
+            }
+        });
 
+        this.sayGoodbuy();
     }
 
     sayHello(){
