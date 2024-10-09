@@ -14,6 +14,9 @@ export default class CommandManager {
                 case 'up':
                     this.navigator.up();
                     break;
+                case 'cd':
+                    this.navigator.cd(args);
+                    break;
                 case '.exit':
                     this.client.sayGoodbye();
                     break;

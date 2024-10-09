@@ -9,7 +9,7 @@ import EventEmitter from 'node:events';
 export default class Client {
     constructor(){
         this.rl = readline.createInterface({ input, output });
-        this.rootDirectory = path.parse(cwd()).root;
+        this.rootDirectory = path.parse(process.cwd()).root;
         this.currentDirectory = os.homedir();
         this.userNameArg = argv.slice(2).find(arg => arg.startsWith('--username='));
         this.userName = this.userNameArg ? this.userNameArg.split('=')[1] : 'user';
@@ -27,7 +27,6 @@ export default class Client {
             if(input !== '.exit') {
                 const [command, ...args] = input.trim().split(' ');
                 this.commandManager.execute(command, args);
-                this.showPath();
             }
         });
 
@@ -35,7 +34,10 @@ export default class Client {
     }
 
     eventsListener(){
-        this.emitter.on('changeDirectory', (directory) => this.setCurrentDirectory(directory));
+        this.emitter.on('changeDirectory', (directory) => {
+            this.setCurrentDirectory(directory);
+            this.showPath();
+        });
     }
 
     getCurrentDirectory(){
@@ -47,6 +49,7 @@ export default class Client {
 
         if (pathResolved === this.rootDirectory) {
             console.log("You are already at the root directory.");
+            this.currentDirectory = pathResolved;
         } else if (pathResolved.startsWith(this.rootDirectory)){
             this.currentDirectory = pathResolved;
         } else {
