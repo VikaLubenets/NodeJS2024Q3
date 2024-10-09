@@ -26,6 +26,9 @@ export default class CommandManager {
                 case 'cat':
                     this.filemanager.cat(args);
                     break;
+                case 'add':
+                    this.filemanager.add(args);
+                    break;
                 case '.exit':
                     this.client.sayGoodbye();
                     break;
