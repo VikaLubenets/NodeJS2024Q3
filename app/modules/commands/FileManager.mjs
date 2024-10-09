@@ -1,5 +1,5 @@
 import { createReadStream } from 'node:fs';
-import { access, constants, writeFile, rename } from 'node:fs/promises';
+import { access, constants, writeFile, rename, copyFile } from 'node:fs/promises';
 import path from 'node:path';
 
 export default class FileManager {
@@ -10,6 +10,7 @@ export default class FileManager {
             {name: 'cat', description: "Read file and print it's content in console"},
             {name: 'add', description: "Create empty file in current working directory"},
             {name: 'rn', description: "Rename file"},
+            {name: 'cp', description: "Copy file"},
         ]
     }
 
@@ -94,6 +95,49 @@ export default class FileManager {
                 await rename(targetFilePathOld, targetFilePathNew);
                 console.log('Rename is completed successfully!');
                 this.client.showPath();
+            }
+        } catch {
+            console.log('Operation failed: file does not exist');
+        }
+    }
+
+    async cp(args){
+        if (!args || !Array.isArray(args) || args.length !== 2) {
+            console.log('Operation failed: please provide a path to file and path to new directory');
+            return;
+        }
+
+        const pathToFile = args[0];
+        const pathToNewDirectory = args[1];
+
+        const currentDirectory = this.client.getCurrentDirectory();
+        const currentFilePath = path.isAbsolute(pathToFile)
+            ? pathToFile
+            : path.resolve(currentDirectory, pathToFile);
+        const newFileDirectory = path.isAbsolute(pathToNewDirectory)
+            ? pathToNewDirectory
+            : path.resolve(currentDirectory, pathToNewDirectory);
+
+        try {
+            await access(currentFilePath, constants.F_OK);
+            try {
+                await access(newFileDirectory, constants.F_OK);
+                const newFilePath = path.resolve(newFileDirectory, path.basename(currentFilePath));
+
+                try {
+                    await access(newFilePath, constants.F_OK);
+                    console.log('Operation failed: this file already exits in new directory');
+                } catch(err){
+                    if(currentFilePath === newFilePath){
+                        console.log('You are going to copy file in the same directory. Please add a path to new directory')
+                    } else {
+                        await copyFile(currentFilePath, newFilePath)
+                        console.log('File is copied!')
+                        this.client.showPath();
+                    }
+                }
+            } catch {
+                console.log('Operation failed: new file directory does not exist');
             }
         } catch {
             console.log('Operation failed: file does not exist');

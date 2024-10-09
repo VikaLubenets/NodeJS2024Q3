@@ -32,6 +32,9 @@ export default class CommandManager {
                 case 'rn':
                     this.filemanager.rn(args);
                     break;
+                case 'cp':
+                    this.filemanager.cp(args);
+                    break;
                 case '.exit':
                     this.client.sayGoodbye();
                     break;
