@@ -5,6 +5,11 @@ export default class Navigator {
     constructor(client, emitter) {
         this.client = client;
         this.emitter = emitter;
+        this.commands = [
+            {name: 'up', description: 'Go upper from current directory'},
+            {name: 'cd', description: 'Go to dedicated folder from current directory'},
+            {name: 'ls', description: 'Print in console list of all files and folders in current directory'},
+        ]
     }
 
     up(args) {
@@ -56,11 +61,11 @@ export default class Navigator {
                     type: file.isFile() ? 'file' : 'directory'
                 }));
                 console.table(tableToShow.sort((a, b) => a.type.localeCompare(b.type)));
+                this.client.showPath();
             })
             .catch((err) => {
                 console.log('Operation failed: target directory does not exist');
             });
     }
-    
 }
 

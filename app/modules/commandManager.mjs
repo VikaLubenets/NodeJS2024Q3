@@ -4,12 +4,13 @@ export default class CommandManager {
     constructor(client, emitter){
         this.client = client;
         this.emitter = emitter;
-        this.commands = ['up', 'cd', 'ls'];
         this.navigator = new Navigator(client, emitter);
+        this.commands = [...this.navigator.commands];
+        this.commandsNames = this.commands.map(el => el.name)
     }
 
     execute(command, args){
-        if(this.commands.includes(command)){
+        if(this.commandsNames.includes(command)){
             switch(command){
                 case 'up':
                     this.navigator.up(args);
@@ -34,7 +35,7 @@ export default class CommandManager {
 
     print(){
         if(this.commands.length > 0){
-            this.commands.map(command => console.log(command));
+            console.table(this.commands)
         }
     }
 }
