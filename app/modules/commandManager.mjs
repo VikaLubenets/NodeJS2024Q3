@@ -12,10 +12,13 @@ export default class CommandManager {
         if(this.commands.includes(command)){
             switch(command){
                 case 'up':
-                    this.navigator.up();
+                    this.navigator.up(args);
                     break;
                 case 'cd':
                     this.navigator.cd(args);
+                    break;
+                case 'ls':
+                    this.navigator.ls(args);
                     break;
                 case '.exit':
                     this.client.sayGoodbye();

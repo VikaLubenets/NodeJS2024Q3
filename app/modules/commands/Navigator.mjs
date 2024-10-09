@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { access, constants } from 'node:fs/promises';
+import { access, constants, readdir } from 'node:fs/promises';
 
 export default class Navigator {
     constructor(client, emitter) {
@@ -7,7 +7,11 @@ export default class Navigator {
         this.emitter = emitter;
     }
 
-    up() {
+    up(args) {
+        if(args && args?.length > 0){
+            console.log('Operation failed: you do not have to pass any arguments to up command');
+            return
+        }
         const currentDirectory = this.client.getCurrentDirectory();
         const upDirectory = path.resolve(currentDirectory, '..');
         this.emitter.emit('changeDirectory', upDirectory);
@@ -34,8 +38,29 @@ export default class Navigator {
             });
     }
 
-    ls() {
-        // Реализация команды ls
+    ls(args) {
+        if (args && args.length > 0) {
+            console.log('Operation failed: you do not have to pass any arguments to ls command');
+            return;
+        }
+    
+        const currentDirectory = this.client.getCurrentDirectory();
+        
+        access(currentDirectory, constants.F_OK)
+            .then(() => {
+                return readdir(currentDirectory, { withFileTypes: true });
+            })
+            .then((files) => {
+                const tableToShow = files.map(file => ({
+                    name: file.name,
+                    type: file.isFile() ? 'file' : 'directory'
+                }));
+                console.table(tableToShow.sort((a, b) => a.type.localeCompare(b.type)));
+            })
+            .catch((err) => {
+                console.log('Operation failed: target directory does not exist');
+            });
     }
+    
 }
 
