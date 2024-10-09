@@ -4,6 +4,7 @@ import * as readline from 'node:readline/promises';
 import { stdin as input, stdout as output, argv, cwd  } from 'node:process';
 import process from 'node:process';
 import CommandManager from './commandManager.mjs';
+import EventEmitter from 'node:events';
 
 export default class Client {
     constructor(){
@@ -12,12 +13,14 @@ export default class Client {
         this.currentDirectory = os.homedir();
         this.userNameArg = argv.slice(2).find(arg => arg.startsWith('--username='));
         this.userName = this.userNameArg ? this.userNameArg.split('=')[1] : 'user';
-        this.commandManager = new CommandManager(this);
+        this.emitter = new EventEmitter();
+        this.commandManager = new CommandManager(this, this.emitter);
     }
 
     run (){
+        this.eventsListener();
         this.sayHello();
-        this.showPath(this.homeDirectory);
+        this.showPath();
         this.commandManager.print();
 
         this.rl.on('line', (input) => {
@@ -28,11 +31,15 @@ export default class Client {
             }
         });
 
-        this.sayGoodbuy();
+        this.sayGoodbye();
+    }
+
+    eventsListener(){
+        this.emitter.on('changeDirectory', (directory) => this.setCurrentDirectory(directory));
     }
 
     getCurrentDirectory(){
-        return this.currentDirectory
+        return this.currentDirectory;
     }
 
     setCurrentDirectory(directory){
@@ -40,7 +47,7 @@ export default class Client {
 
         if (pathResolved === this.rootDirectory) {
             console.log("You are already at the root directory.");
-        } else if(pathResolved.startsWith(this.rootDirectory)){
+        } else if (pathResolved.startsWith(this.rootDirectory)){
             this.currentDirectory = pathResolved;
         } else {
             console.log("Wrong directory. Try again");
@@ -55,8 +62,8 @@ export default class Client {
         console.log(`You are currently in ${this.currentDirectory}`);
     }
 
-    sayGoodbuy(){
-        process.on('SIGINT', process.exit);
+    sayGoodbye(){
+        process.on('SIGINT', () => process.exit());
 
         this.rl.on('line', (input) => {
             if(input === '.exit') {
@@ -66,6 +73,6 @@ export default class Client {
 
         process.on('exit', () => {
             console.log(`Thank you for using File Manager, ${this.userName}, goodbye!`);
-        })
+        });
     }
 }

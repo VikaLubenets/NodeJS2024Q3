@@ -1,41 +1,34 @@
-import path from 'node:path'
+import Navigator from './commands/Navigator.mjs';
 
 export default class CommandManager {
-    constructor(client){
+    constructor(client, emitter){
         this.client = client;
+        this.emitter = emitter;
         this.commands = ['up', 'cd', 'ls'];
+        this.navigator = new Navigator(client, emitter);
     }
 
     execute(command, args){
         if(this.commands.includes(command)){
             switch(command){
-                case 'up': this.up()
-                break
-
-            case '.exit':
-                this.client.sayGoodbuy();
-                break;
-    
-              default:
-                console.log('there is no fn yet for such command')
-                break
+                case 'up':
+                    this.navigator.up();
+                    break;
+                case '.exit':
+                    this.client.sayGoodbye();
+                    break;
+                default:
+                    console.log('There is no function yet for such command');
+                    break;
             }
-
         } else {
-            console.log('Invalid input. Please try again')
+            console.log('Invalid input. Please try again');
         }
     }
 
     print(){
         if(this.commands.length > 0){
-            this.commands.map(command => console.log(command))
+            this.commands.map(command => console.log(command));
         }
     }
-
-    up(){
-        const currentDirectory = this.client.getCurrentDirectory();
-        const upDirectory = path.resolve(currentDirectory, '..');
-        this.client.setCurrentDirectory(upDirectory);
-    }
-
 }
