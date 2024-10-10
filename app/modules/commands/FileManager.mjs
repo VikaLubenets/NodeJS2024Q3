@@ -1,4 +1,4 @@
-import { createReadStream } from 'node:fs';
+import { createReadStream, createWriteStream } from 'node:fs';
 import { access, constants, writeFile, rename, copyFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -11,6 +11,8 @@ export default class FileManager {
             {name: 'add', description: "Create empty file in current working directory"},
             {name: 'rn', description: "Rename file"},
             {name: 'cp', description: "Copy file"},
+            {name: 'mv', description: "Move file"},
+            {name: 'rm', description: "Delete file"},
         ]
     }
 
@@ -131,12 +133,26 @@ export default class FileManager {
                     if(currentFilePath === newFilePath){
                         console.log('You are going to copy file in the same directory. Please add a path to new directory')
                     } else {
-                        await copyFile(currentFilePath, newFilePath)
-                        console.log('File is copied!')
-                        this.client.showPath();
+                        const streamReadable = createReadStream(currentFilePath);
+                        const streamWritable = createWriteStream(newFilePath, { flags: 'w', encoding: 'utf-8' });
+                        
+                        streamReadable.pipe(streamWritable);
+
+                        streamReadable.on('error', (err) => {
+                            console.log(`Operation failed: ${err.message}`);
+                        });
+    
+                        streamWritable.on('error', (err) => {
+                            console.log(`Operation failed: ${err.message}`);
+                        });
+    
+                        streamWritable.on('finish', () => {
+                            console.log('File is copied!');
+                            this.client.showPath();
+                        });
                     }
                 }
-            } catch {
+            } catch(err) {
                 console.log('Operation failed: new file directory does not exist');
             }
         } catch {
