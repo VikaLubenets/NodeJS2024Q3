@@ -2,6 +2,7 @@ import FileManager from './commands/FileManager.mjs';
 import HashManager from './commands/HashManager.mjs';
 import Navigator from './commands/Navigator.mjs';
 import OSManager from './commands/OsManager.mjs';
+import ZlibManager from './commands/ZlibManager.mjs';
 
 export default class CommandManager {
     constructor(client, emitter){
@@ -11,11 +12,13 @@ export default class CommandManager {
         this.filemanager = new FileManager(client, emitter);
         this.osmanager = new OSManager(client, emitter);
         this.hashmanager = new HashManager(client, emitter);
+        this.zlibmanager = new ZlibManager(client, emitter);
         this.commands = [
             ...this.navigator.commands, 
             ...this.filemanager.commands, 
             ...this.osmanager.commands, 
             ...this.hashmanager.commands,
+            ...this.zlibmanager.commands,
         ];
         this.commandsNames = this.commands.map(el => el.name)
     }
@@ -56,9 +59,16 @@ export default class CommandManager {
                 case 'hash':
                     this.hashmanager.hash(args);
                     break;
+                case 'compress':
+                    this.zlibmanager.compress(args);
+                    break;
+                case 'decompress':
+                    this.zlibmanager.decompress(args);
+                    break;
                 case '.exit':
                     this.client.sayGoodbye();
                     break;
+
                 default:
                     console.log('There is no function yet for such command');
                     break;
@@ -69,6 +79,7 @@ export default class CommandManager {
     }
 
     print(){
+        console.log('Commands list:')
         if(this.commands.length > 0){
             console.table(this.commands)
         }

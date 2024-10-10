@@ -6,9 +6,9 @@ export default class Navigator {
         this.client = client;
         this.emitter = emitter;
         this.commands = [
-            {name: 'up', description: 'Go upper from current directory'},
-            {name: 'cd', description: 'Go to dedicated folder from current directory'},
-            {name: 'ls', description: 'Print in console list of all files and folders in current directory'},
+            {name: 'up', description: 'Go upper from current directory', example: 'up'},
+            {name: 'cd', description: 'Go to dedicated folder from current directory', example: 'cd .. | cd ./Desktop | cd /Users/User/Desktop'},
+            {name: 'ls', description: 'Print in console list of all files and folders in cd', example: 'ls'},
         ]
     }
 

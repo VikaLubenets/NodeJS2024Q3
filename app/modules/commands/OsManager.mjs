@@ -5,7 +5,7 @@ export default class OSManager {
         this.client = client;
         this.emitter = emitter;
         this.commands = [
-            {name: 'os', description: 'Operating system info'},
+            {name: 'os', description: 'Operating system info', example: 'os --EOL | os --cpus'},
         ]
         this.flags = ['--EOL', '--cpus', '--homedir', '--username', '--architecture']
     }

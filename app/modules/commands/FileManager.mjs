@@ -7,12 +7,12 @@ export default class FileManager {
         this.client = client;
         this.emitter = emitter;
         this.commands = [
-            {name: 'cat', description: "Read file and print it's content in console"},
-            {name: 'add', description: "Create empty file in current working directory"},
-            {name: 'rn', description: "Rename file"},
-            {name: 'cp', description: "Copy file"},
-            {name: 'mv', description: "Move file"},
-            {name: 'rm', description: "Delete file"},
+            {name: 'cat', description: "Read file and print it's content in console", example: 'cat path_to_file'},
+            {name: 'add', description: "Create empty file in current working directory", example: 'add new_file_name'},
+            {name: 'rn', description: "Rename file", example: 'rn path_to_file new_filename'},
+            {name: 'cp', description: "Copy file", example: 'cp path_to_file path_to_new_directory'},
+            {name: 'mv', description: "Move file", example: 'mv path_to_file path_to_new_directory'},
+            {name: 'rm', description: "Delete file", example: 'rm path_to_file'},
         ]
     }
 

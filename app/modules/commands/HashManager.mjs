@@ -8,7 +8,7 @@ export default class HashManager {
         this.client = client;
         this.emitter = emitter;
         this.commands = [
-            { name: 'hash', description: 'Calculate hash for file and print it into console' },
+            { name: 'hash', description: 'Calculate hash for file and print it into console', example: 'hash path_to_file' },
         ];
     }
 
