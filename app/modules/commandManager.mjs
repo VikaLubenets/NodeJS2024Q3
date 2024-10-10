@@ -1,5 +1,6 @@
 import FileManager from './commands/FileManager.mjs';
 import Navigator from './commands/Navigator.mjs';
+import OSManager from './commands/OsManager.mjs';
 
 export default class CommandManager {
     constructor(client, emitter){
@@ -7,7 +8,8 @@ export default class CommandManager {
         this.emitter = emitter;
         this.navigator = new Navigator(client, emitter);
         this.filemanager = new FileManager(client, emitter);
-        this.commands = [...this.navigator.commands, ...this.filemanager.commands];
+        this.osmanager = new OSManager(client, emitter);
+        this.commands = [...this.navigator.commands, ...this.filemanager.commands, ...this.osmanager.commands];
         this.commandsNames = this.commands.map(el => el.name)
     }
 
@@ -41,6 +43,9 @@ export default class CommandManager {
                 case 'rm':
                     this.filemanager.rm(args);
                     break;
+                case 'os':
+                    this.osmanager.os(args);
+                     break;
                 case '.exit':
                     this.client.sayGoodbye();
                     break;
