@@ -1,5 +1,5 @@
 import { createReadStream, createWriteStream } from 'node:fs';
-import { access, constants, writeFile, rename, copyFile } from 'node:fs/promises';
+import { access, constants, writeFile, rename, unlink } from 'node:fs/promises';
 import path from 'node:path';
 
 export default class FileManager {
@@ -131,7 +131,7 @@ export default class FileManager {
                     console.log('Operation failed: this file already exits in new directory');
                 } catch(err){
                     if(currentFilePath === newFilePath){
-                        console.log('You are going to copy file in the same directory. Please add a path to new directory')
+                        console.log('Operation failed: you are going to copy file in the same directory. Please add a path to new directory')
                     } else {
                         const streamReadable = createReadStream(currentFilePath);
                         const streamWritable = createWriteStream(newFilePath, { flags: 'w', encoding: 'utf-8' });
@@ -156,6 +156,95 @@ export default class FileManager {
                 console.log('Operation failed: new file directory does not exist');
             }
         } catch {
+            console.log('Operation failed: file does not exist');
+        }
+    }
+
+    async mv(args){
+        if (!args || !Array.isArray(args) || args.length !== 2) {
+            console.log('Operation failed: please provide a path to file and path to new directory');
+            return;
+        }
+
+        const pathToFile = args[0];
+        const pathToNewDirectory = args[1];
+
+        const currentDirectory = this.client.getCurrentDirectory();
+        const currentFilePath = path.isAbsolute(pathToFile)
+            ? pathToFile
+            : path.resolve(currentDirectory, pathToFile);
+        const newFileDirectory = path.isAbsolute(pathToNewDirectory)
+            ? pathToNewDirectory
+            : path.resolve(currentDirectory, pathToNewDirectory);
+
+        try {
+            await access(currentFilePath, constants.F_OK);
+            try {
+                await access(newFileDirectory, constants.F_OK);
+                const newFilePath = path.resolve(newFileDirectory, path.basename(currentFilePath));
+
+                try {
+                    await access(newFilePath, constants.F_OK);
+                    console.log('Operation failed: this file already exits in new directory');
+                } catch(err){
+                    if(currentFilePath === newFilePath){
+                        console.log('Operation failed: you are going to move file in the same directory. Please add a path to new directory')
+                    } else {
+                        const streamReadable = createReadStream(currentFilePath);
+                        const streamWritable = createWriteStream(newFilePath, { flags: 'w', encoding: 'utf-8' });
+                        
+                        streamReadable.pipe(streamWritable);
+
+                        streamReadable.on('error', (err) => {
+                            console.log(`Operation failed: ${err.message}`);
+                        });
+    
+                        streamWritable.on('error', (err) => {
+                            console.log(`Operation failed: ${err.message}`);
+                        });
+    
+                        streamWritable.on('finish', async () => {
+                            console.log('File is moved!');
+                            this.client.showPath();
+                            try {
+                                await unlink(currentFilePath);
+                            } catch (err) {
+                                console.log(`Operation failed while deleting the original file: ${err.message}`);
+                            }
+                        });
+                    }
+                }
+            } catch(err) {
+                console.log('Operation failed: new file directory does not exist');
+            }
+        } catch {
+            console.log('Operation failed: file does not exist');
+        }
+    }
+
+    async rm(args){
+        if (!args || !Array.isArray(args) || args.length !== 1) {
+            console.log('Operation failed: please provide a single valid file path');
+            return;
+        }
+
+        const pathToFile = args[0];
+        const currentDirectory = this.client.getCurrentDirectory();
+        const targetFilePath = path.isAbsolute(pathToFile)
+            ? pathToFile
+            : path.resolve(currentDirectory, pathToFile);
+
+        try{
+            await access(targetFilePath, constants.F_OK);
+            try{
+                await unlink(targetFilePath);
+                console.log('File is deleted')
+                this.client.showPath()
+            } catch(err){
+                console.log(`Operation failed: ${err.message}`);
+            }
+
+        } catch(err){
             console.log('Operation failed: file does not exist');
         }
     }
