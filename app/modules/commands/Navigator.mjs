@@ -23,12 +23,12 @@ export default class Navigator {
     }
 
     cd(args) {
-        if (!args || !Array.isArray(args) || args.length !== 1) {
-            console.log('Operation failed: please provide a single valid directory path');
+        if (!args || !Array.isArray(args) || args.length === 0) {
+            console.log('Operation failed: please provide a valid directory path');
             return;
         }
     
-        const directory = args[0];
+        const directory = args.join(' ');
         const currentDirectory = this.client.getCurrentDirectory();
         const targetDirectory = path.isAbsolute(directory)
             ? directory
@@ -42,6 +42,7 @@ export default class Navigator {
                 console.log('Operation failed: target directory does not exist');
             });
     }
+    
 
     ls(args) {
         if (args && args.length > 0) {

@@ -30,6 +30,7 @@ export default class OSManager {
                     cpusInfo.forEach((cpu, index) => {
                         console.log(`CPU ${index + 1}: ${cpu.model}, ${cpu.speed / 1000} GHz`);
                     });
+                    this.client.showPath();
                     break;
                 case '--homedir':
                     console.log('--homedir is', os.homedir() ?? '')

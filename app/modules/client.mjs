@@ -1,6 +1,7 @@
 import os from 'node:os';
 import path from 'node:path';
 import * as readline from 'node:readline/promises';
+import { access, constants } from 'node:fs/promises';
 import { stdin as input, stdout as output, argv, cwd  } from 'node:process';
 import process from 'node:process';
 import CommandManager from './commandManager.mjs';
@@ -36,7 +37,6 @@ export default class Client {
     eventsListener(){
         this.emitter.on('changeDirectory', (directory) => {
             this.setCurrentDirectory(directory);
-            this.showPath();
         });
     }
 
@@ -44,17 +44,22 @@ export default class Client {
         return this.currentDirectory;
     }
 
-    setCurrentDirectory(directory){
-        const pathResolved = path.resolve(directory);
-
-        if (pathResolved === this.rootDirectory) {
-            console.log("You are already at the root directory.");
-            this.currentDirectory = pathResolved;
-        } else if (pathResolved.startsWith(this.rootDirectory)){
-            this.currentDirectory = pathResolved;
-        } else {
-            console.log("Wrong directory. Try again");
-        }
+    setCurrentDirectory(directory) {
+        const targetPath = path.isAbsolute(directory)
+            ? path.resolve(directory)
+            : path.resolve(this.currentDirectory, directory);
+    
+        access(targetPath, constants.F_OK)
+            .then(() => {
+                if (targetPath === this.rootDirectory) {
+                    console.log("You are already at the root directory.");
+                }
+                this.currentDirectory = targetPath;
+                this.showPath();
+            })
+            .catch(() => {
+                console.log("Wrong directory. Try again");
+            });
     }
 
     sayHello(){

@@ -17,12 +17,12 @@ export default class FileManager {
     }
 
     async cat(args) {
-        if (!args || !Array.isArray(args) || args.length !== 1) {
+        if (!args || !Array.isArray(args) || args.length === 0) {
             console.log('Operation failed: please provide a single valid file path');
             return;
         }
 
-        const pathToFile = args[0];
+        const pathToFile = args.join(' '); 
         const currentDirectory = this.client.getCurrentDirectory();
         const targetFilePath = path.isAbsolute(pathToFile)
             ? pathToFile
@@ -104,13 +104,13 @@ export default class FileManager {
     }
 
     async cp(args){
-        if (!args || !Array.isArray(args) || args.length !== 2) {
+        if (!args || !Array.isArray(args) || args.length <= 1) {
             console.log('Operation failed: please provide a path to file and path to new directory');
             return;
         }
 
         const pathToFile = args[0];
-        const pathToNewDirectory = args[1];
+        const pathToNewDirectory = args.slice(1).join(' ');
 
         const currentDirectory = this.client.getCurrentDirectory();
         const currentFilePath = path.isAbsolute(pathToFile)
@@ -161,13 +161,13 @@ export default class FileManager {
     }
 
     async mv(args){
-        if (!args || !Array.isArray(args) || args.length !== 2) {
-            console.log('Operation failed: please provide a path to file and path to new directory');
+        if (!args || !Array.isArray(args) || args.length <= 1) {
+            console.log('Operation failed: please provide valid paths to file and new directory');
             return;
         }
 
         const pathToFile = args[0];
-        const pathToNewDirectory = args[1];
+        const pathToNewDirectory = args.slice(1).join(' ');
 
         const currentDirectory = this.client.getCurrentDirectory();
         const currentFilePath = path.isAbsolute(pathToFile)
